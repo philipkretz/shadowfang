@@ -1,0 +1,8 @@
+export { renderGoomba } from './goomba'
+export { renderKoopa } from './koopa'
+export { renderNinja } from './ninja'
+export { renderArcher } from './archer'
+export { renderSumo } from './sumo'
+export { renderMushroom } from './mushroom'
+export { renderSkeleton } from './skeleton'
+export { renderDrone } from './drone'
