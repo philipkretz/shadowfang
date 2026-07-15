@@ -126,8 +126,6 @@ export function EnemyMesh({ enemy }: { enemy: Enemy }) {
         <sphereGeometry args={[0.02, 6, 6]} />
         <meshStandardMaterial color="#1a0000" />
       </mesh>
-      {/* Glow light */}
-      <pointLight position={[0, 0, 0.2]} color="#ff5511" intensity={1} distance={2} />
     </group>
   )
 }

@@ -49,7 +49,7 @@ function ShurikenMeshInner({ shuriken, meshRef, timeRef }: {
           <cylinderGeometry args={[0.04, 0.04, 0.08, 6]} />
           <meshStandardMaterial color={'#bbbbcc'} emissive={'#aaaacc'} emissiveIntensity={2} roughness={0.3} metalness={0.8} />
         </mesh>
-        <pointLight ref={lightRef} color={'#5555cc'} intensity={1} distance={2} />
+
       </group>
       <mesh ref={trailRef}>
         <sphereGeometry args={[0.08, 6, 4]} />
@@ -98,7 +98,7 @@ function ShurikenMesh({ shuriken }: { shuriken: Shuriken }) {
           <dodecahedronGeometry args={[0.18, 0]} />
           <meshStandardMaterial color={'#5a3a1e'} roughness={0.9} transparent opacity={0.7} />
         </mesh>
-        <pointLight color={'#8b3a0f'} intensity={1} distance={2} />
+
       </group>
     )
   }
@@ -122,7 +122,7 @@ function ShurikenMesh({ shuriken }: { shuriken: Shuriken }) {
           <cylinderGeometry args={[0.025, 0.025, 0.42, 8]} />
           <meshStandardMaterial color={'#00ffff'} emissive={'#00ffff'} emissiveIntensity={5} transparent opacity={0.25} />
         </mesh>
-        <pointLight color={'#00ffff'} intensity={2.5} distance={3} />
+
       </group>
     )
   }
@@ -146,7 +146,7 @@ function ShurikenMesh({ shuriken }: { shuriken: Shuriken }) {
           <torusGeometry args={[0.14, 0.015, 8, 12]} />
           <meshStandardMaterial color={'#8800ff'} emissive={'#aa00ff'} emissiveIntensity={3} transparent opacity={0.5} />
         </mesh>
-        <pointLight color={'#8800ff'} intensity={2} distance={3} />
+
       </group>
     )
   }
@@ -174,7 +174,7 @@ function ShurikenMesh({ shuriken }: { shuriken: Shuriken }) {
           <coneGeometry args={[0.025, 0.1, 4]} />
           <meshStandardMaterial color={'#ffdd44'} emissive={'#ffcc00'} emissiveIntensity={2} transparent opacity={0.5} />
         </mesh>
-        <pointLight color={'#ff6600'} intensity={2} distance={3} />
+
       </group>
     )
   }
@@ -277,7 +277,7 @@ function FireballMesh({ fireball }: { fireball: Fireball }) {
             roughness={0.05}
           />
         </mesh>
-        <pointLight ref={lightRef} color="#ff5500" intensity={4} distance={4} />
+
       </group>
       <mesh ref={trailRef}>
         <sphereGeometry args={[0.1, 6, 4]} />
@@ -309,7 +309,6 @@ function ArrowMesh({ arrow }: { arrow: Arrow }) {
   const meshRef = useRef<THREE.Group>(null)
   const trailRef = useRef<THREE.Mesh>(null)
   const headRef = useRef<THREE.Mesh>(null)
-  const lightRef = useRef<THREE.PointLight>(null)
   const timeRef = useRef(0)
 
   useFrame((_, delta) => {
@@ -323,10 +322,6 @@ function ArrowMesh({ arrow }: { arrow: Arrow }) {
     if (headRef.current) {
       const mat = headRef.current.material as THREE.MeshStandardMaterial
       mat.emissiveIntensity = 2 + Math.sin(t * 18) * 1.0
-    }
-
-    if (lightRef.current) {
-      lightRef.current.intensity = 1.0 + Math.sin(t * 15) * 0.5
     }
 
     if (trailRef.current) {
@@ -357,7 +352,7 @@ function ArrowMesh({ arrow }: { arrow: Arrow }) {
           <boxGeometry args={[0.04, 0.025, 0.005]} />
           <meshStandardMaterial color="#cc2222" roughness={0.4} />
         </mesh>
-        <pointLight ref={lightRef} color="#ff8844" intensity={1} distance={2} />
+
       </group>
       <mesh ref={trailRef}>
         <sphereGeometry args={[0.06, 6, 4]} />
@@ -372,8 +367,18 @@ function ProjectileSystem({ shurikens, fireballs, arrows }: {
   fireballs: React.RefObject<Fireball[]>
   arrows: React.RefObject<Arrow[]>
 }) {
-  const [, setTick] = useState(0)
-  useFrame(() => setTick(t => t + 1))
+  const [activeCount, setActiveCount] = useState(0)
+  const prevCountRef = useRef(0)
+
+  useFrame(() => {
+    const count = shurikens.current.filter(s => s.active).length
+      + fireballs.current.filter(f => f.active).length
+      + arrows.current.filter(a => a.active).length
+    if (count !== prevCountRef.current) {
+      prevCountRef.current = count
+      setActiveCount(count)
+    }
+  })
 
   return (
     <>

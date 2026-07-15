@@ -356,7 +356,6 @@ export function renderSkeleton(
         <meshStandardMaterial color={boneLight} roughness={0.55} />
       </mesh>
 
-      <pointLight position={[0, 0.15, 0.25]} color="#44ff44" intensity={0.7} distance={3} />
     </group>
   )
 }

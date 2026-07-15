@@ -92,10 +92,7 @@ export function renderDrone(
         <cylinderGeometry args={[0.012, 0.012, 0.1, 4]} />
         <meshStandardMaterial color={'#334455'} roughness={0.5} metalness={0.6} />
       </mesh>
-      {/* Engine glow */}
-      <pointLight position={[0, -0.1, 0]} color={droneGlow} intensity={1.5} distance={2.5} />
-      {/* Eye glow */}
-      <pointLight position={[0, 0.06, 0.35]} color={droneAccent} intensity={0.8} distance={1.5} />
+
     </group>
   )
 }

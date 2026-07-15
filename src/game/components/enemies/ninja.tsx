@@ -401,7 +401,6 @@ export function renderNinja(
         <meshStandardMaterial color={cloth} roughness={0.5} />
       </mesh>
 
-      <pointLight color="#ff2222" intensity={0.8} distance={3} />
     </group>
   )
 }

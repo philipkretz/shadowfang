@@ -274,6 +274,7 @@ export function useGameState() {
     p.velocity.y += GRAVITY * dt
     if (p.velocity.y < TERMINAL_VELOCITY) p.velocity.y = TERMINAL_VELOCITY
 
+    const prevBottomY = p.position.y - PLAYER_HEIGHT / 2
     p.position.x += p.velocity.x * dt
     p.position.y += p.velocity.y * dt
 
@@ -334,12 +335,26 @@ export function useGameState() {
       const platTop = plat.position.y + plat.size.y / 2
       const stepUpHeight = 0.45
       const isStepUp = overlapY > 0 && overlapY <= stepUpHeight && p.velocity.x !== 0 && playerFeet >= platTop - stepUpHeight && dy < 0
+      const isClimbing = dy < 0 && p.velocity.x !== 0 && overlapX < 0.15 && overlapY > 0 && overlapY <= PLAYER_HEIGHT
 
-      const preferY = overlapY < overlapX || isStepUp || (overlapY === overlapX && p.velocity.y !== 0)
+      const preferY = overlapY < overlapX || isStepUp || isClimbing || (overlapY === overlapX && p.velocity.y !== 0)
 
       if (preferY) {
-        const normalY = dy > 0 ? 1 : -1
-        p.position.y += normalY * overlapY
+        let normalY: number
+        if (isStepUp || isClimbing) {
+          normalY = 1
+        } else if (preCollisionVelY < -0.05) {
+          normalY = 1
+        } else if (preCollisionVelY > 0.05) {
+          normalY = -1
+        } else {
+          normalY = dy > 0 ? 1 : -1
+        }
+        if (normalY > 0) {
+          p.position.y = platTop + PLAYER_HEIGHT / 2
+        } else {
+          p.position.y += normalY * overlapY
+        }
         if (normalY > 0) {
           p.onGround = true
           p.doubleJumped = false
@@ -351,6 +366,7 @@ export function useGameState() {
             if (plat.contains === 'coin') {
               g.coins++
               g.score += 100
+              g.pendingEvents.push('coin')
               addParticles(plat.position.x, plat.position.y + 0.8, 8, '#ffd700')
             } else if (plat.contains === 'mushroom') {
               const pu = powerUps.current.find(pu => pu.type === 'mushroom' && !pu.collected && !pu.active)
@@ -389,6 +405,7 @@ export function useGameState() {
             if (plat.contains === 'coin') {
               g.coins++
               g.score += 100
+              g.pendingEvents.push('coin')
               addParticles(plat.position.x, plat.position.y + 0.8, 8, '#ffd700')
             } else if (plat.contains === 'mushroom') {
               const pu = powerUps.current.find(pu => pu.type === 'mushroom' && !pu.collected && !pu.active)
@@ -472,7 +489,6 @@ export function useGameState() {
     }
 
     if (!p.onGround && preCollisionVelY < 0) {
-      const prevBottom = (p.position.y - preCollisionVelY * dt) - PLAYER_HEIGHT / 2
       const curBottom = p.position.y - PLAYER_HEIGHT / 2
       const halfPW = PLAYER_WIDTH / 2
       for (const plat of platList) {
@@ -480,7 +496,7 @@ export function useGameState() {
         const halfBW = plat.size.x / 2
         const platTop = plat.position.y + plat.size.y / 2
         if (Math.abs(p.position.x - plat.position.x) < halfPW + halfBW + 0.05) {
-          if (prevBottom >= platTop && curBottom < platTop) {
+          if (prevBottomY >= platTop && curBottom < platTop) {
             p.position.y = platTop + PLAYER_HEIGHT / 2
             p.onGround = true
             p.doubleJumped = false
@@ -516,6 +532,7 @@ export function useGameState() {
         coin.collected = true
         g.coins++
         g.score += 200
+        g.pendingEvents.push('coin')
         addParticles(coin.position.x, coin.position.y, 10, '#ffd700')
       }
     }

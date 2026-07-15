@@ -166,15 +166,31 @@ export function HUD({
   showVictory: boolean
   onVictoryContinue: () => void
 }) {
-  const [state, setState] = useState<GameState>({ ...game.current })
+  const [score, setScore] = useState(0)
+  const [coins, setCoins] = useState(0)
+  const [world, setWorld] = useState('1-1')
+  const [time, setTime] = useState(0)
+  const [lives, setLives] = useState(3)
+  const [combo, setCombo] = useState(0)
   const [activeBoss, setActiveBoss] = useState<Boss | null>(null)
 
   useEffect(() => {
     let raf: number
+    const worlds: Record<number, string> = { 1: '1-1', 2: '1-2', 3: '2-1', 4: '2-2', 5: '3-1', 6: '3-2', 7: '4-1' }
+    let prevScore = 0, prevCoins = 0, prevLives = 3, prevCombo = 0, prevTime = 0, prevWorld = '1-1'
+    let prevBossHp = -1
     const tick = () => {
-      setState({ ...game.current })
-      const active = bosses.current.find(b => b.active && b.alive && !b.defeated)
-      setActiveBoss(active || null)
+      const g = game.current
+      if (g.score !== prevScore) { prevScore = g.score; setScore(g.score) }
+      if (g.coins !== prevCoins) { prevCoins = g.coins; setCoins(g.coins) }
+      if (g.lives !== prevLives) { prevLives = g.lives; setLives(g.lives) }
+      if (g.combo !== prevCombo) { prevCombo = g.combo; setCombo(g.combo) }
+      if (Math.floor(g.time) !== prevTime) { prevTime = Math.floor(g.time); setTime(prevTime) }
+      const w = worlds[g.level] || '1-1'
+      if (w !== prevWorld) { prevWorld = w; setWorld(w) }
+      const boss = bosses.current.find(b => b.active && b.alive && !b.defeated) || null
+      const bhp = boss ? boss.health : -1
+      if (bhp !== prevBossHp) { prevBossHp = bhp; setActiveBoss(boss) }
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -189,33 +205,33 @@ export function HUD({
         <div className="text-white font-bold text-sm md:text-lg">
           <span className="text-yellow-400">SCORE</span>
           <br />
-          <span className="text-white">{String(state.score).padStart(6, '0')}</span>
+          <span className="text-white">{String(score).padStart(6, '0')}</span>
         </div>
         <div className="text-white font-bold text-sm md:text-lg">
           <span className="text-yellow-400">COINS</span>
           <br />
-          <span className="text-yellow-300">×{String(state.coins).padStart(2, '0')}</span>
+          <span className="text-yellow-300">×{String(coins).padStart(2, '0')}</span>
         </div>
         <div className="text-white font-bold text-sm md:text-lg">
           <span className="text-yellow-400">WORLD</span>
           <br />
-          <span>{[1,1,2,2,3,3,4][state.level - 1]}-{[1,2,1,2,1,2,1][state.level - 1]}</span>
+          <span>{world}</span>
         </div>
         <div className="text-white font-bold text-sm md:text-lg">
           <span className="text-yellow-400">TIME</span>
           <br />
-          <span className={state.time < 60 ? 'text-red-400' : 'text-white'}>{Math.floor(state.time)}</span>
+          <span className={time < 60 ? 'text-red-400' : 'text-white'}>{time}</span>
         </div>
         <div className="text-white font-bold text-sm md:text-lg">
           <span className="text-yellow-400">LIVES</span>
           <br />
-          <span className="text-green-400">×{state.lives}</span>
+          <span className="text-green-400">×{lives}</span>
         </div>
-        {state.combo > 1 && (
+        {combo > 1 && (
           <div className="text-white font-bold text-sm md:text-lg animate-pulse">
             <span className="text-orange-400">COMBO</span>
             <br />
-            <span className="text-orange-300">×{state.combo}</span>
+            <span className="text-orange-300">×{combo}</span>
           </div>
         )}
       </div>
@@ -246,22 +262,22 @@ export function HUD({
         <div className="fixed inset-0 flex items-center justify-center pointer-events-auto" style={{ background: 'rgba(0,0,0,0.75)' }}>
           <div className="text-center bg-gradient-to-b from-purple-900/80 to-black/80 p-8 rounded-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
             {showNameEntry ? (
-              <NameEntry score={state.score} level={state.level} onSubmit={onHighscoreSave} />
+              <NameEntry score={score} level={game.current.level} onSubmit={onHighscoreSave} />
             ) : levelComplete ? (
               <>
                 <h2 className="text-4xl md:text-6xl font-bold text-white mb-2">LEVEL COMPLETE!</h2>
                 <p className="text-base text-white/60 italic mb-3">
-                  {state.level === 1 && "Fang surveys the destruction. The meadows will never be the same. Probably fine."}
-                  {state.level === 2 && "The storm passes. Fang wrings out his cape. It squelches ominously."}
-                  {state.level === 3 && "Fresh air at last. Fang kisses the ground. It's slimy, but he doesn't care."}
-                  {state.level === 4 && "He made it through the sky. The clouds tasted like defeat. Mostly the enemies'."}
-                  {state.level === 5 && "The castle crumbles. Fang dusts off his cape. It's mostly ash at this point."}
-                  {state.level === 6 && "The lava fortress falls. Fang is officially done with fire. And castles. And everything."}
-                  {state.level >= 7 && "The Shadow Master has fallen. Fang retrieves the Shadow Blade. And his mug. Priorities."}
+                  {game.current.level === 1 && "Fang surveys the destruction. The meadows will never be the same. Probably fine."}
+                  {game.current.level === 2 && "The storm passes. Fang wrings out his cape. It squelches ominously."}
+                  {game.current.level === 3 && "Fresh air at last. Fang kisses the ground. It's slimy, but he doesn't care."}
+                  {game.current.level === 4 && "He made it through the sky. The clouds tasted like defeat. Mostly the enemies'."}
+                  {game.current.level === 5 && "The castle crumbles. Fang dusts off his cape. It's mostly ash at this point."}
+                  {game.current.level === 6 && "The lava fortress falls. Fang is officially done with fire. And castles. And everything."}
+                  {game.current.level >= 7 && "The Shadow Master has fallen. Fang retrieves the Shadow Blade. And his mug. Priorities."}
                 </p>
-                <p className="text-xl text-yellow-400 mb-1">SCORE: {String(state.score).padStart(6, '0')}</p>
-                <p className="text-lg text-green-400 mb-2">TIME BONUS: +{Math.floor(state.time * 10)}</p>
-                {state.level >= 7 && (
+                <p className="text-xl text-yellow-400 mb-1">SCORE: {String(score).padStart(6, '0')}</p>
+                <p className="text-lg text-green-400 mb-2">TIME BONUS: +{time * 10}</p>
+                {game.current.level >= 7 && (
                   <p className="text-sm text-yellow-200/70 italic mb-2">"Somebody get this man a vacation." — The Narrator</p>
                 )}
               </>
@@ -269,11 +285,11 @@ export function HUD({
               <>
                 <h2 className="text-4xl md:text-6xl font-bold text-white mb-2">GAME OVER</h2>
                 <p className="text-base text-white/60 italic mb-3">
-                  {state.lives <= 0
+                  {lives <= 0
                     ? "Fang has run out of extra lives. And patience. Mostly patience."
                     : "Gravity: 1, Fang: 0. A tragic tale."}
                 </p>
-                <p className="text-xl text-yellow-400 mb-2">SCORE: {String(state.score).padStart(6, '0')}</p>
+                <p className="text-xl text-yellow-400 mb-2">SCORE: {String(score).padStart(6, '0')}</p>
                 <p className="text-sm text-white/40 italic mb-1">The Shadow Master laughs. This isn't over.</p>
               </>
             )}

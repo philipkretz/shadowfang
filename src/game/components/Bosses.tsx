@@ -118,7 +118,6 @@ export function BossNinja({ boss }: { boss: Boss }) {
         <boxGeometry args={[0.06, 0.035, 0.02]} />
         <meshStandardMaterial color={glow} emissive={glow} emissiveIntensity={2.5} />
       </mesh>
-      <pointLight position={[0, 0.8, 0.3]} color={glow} intensity={1.5} distance={3} />
 
       {/* Headband - top */}
       <mesh position={[0, 0.88, 0]} rotation={[0, 0, 0]}>
@@ -197,10 +196,6 @@ export function BossNinja({ boss }: { boss: Boss }) {
         <meshStandardMaterial color={'#888888'} roughness={0.2} metalness={0.8} />
       </mesh>
 
-      {/* Phase indicator - attack glow */}
-      {boss.phase === 'attack' && (
-        <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={3} distance={4} />
-      )}
     </group>
   )
 }
@@ -333,12 +328,6 @@ export function BossGolem({ boss }: { boss: Boss }) {
         <boxGeometry args={[0.26, 0.1, 0.3]} />
         <meshStandardMaterial color={'#3a2a1a'} roughness={0.9} />
       </mesh>
-      {isEnraged && (
-        <pointLight position={[0, 0.4, 0.3]} color={glow} intensity={2} distance={4} />
-      )}
-      {boss.phase === 'attack' && (
-        <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={3} distance={5} />
-      )}
     </group>
   )
 }
@@ -481,10 +470,6 @@ export function BossStorm({ boss }: { boss: Boss }) {
             <meshStandardMaterial color={glow} emissive={glow} emissiveIntensity={5} transparent opacity={0.8} />
           </mesh>
         </>
-      )}
-      <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={isEnraged ? 2 : 1.2} distance={4} />
-      {boss.phase === 'attack' && (
-        <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={3} distance={5} />
       )}
     </group>
   )
@@ -648,15 +633,6 @@ export function BossShadow({ boss }: { boss: Boss }) {
         <boxGeometry args={[0.2, 0.08, 0.25]} />
         <meshStandardMaterial color={'#0a000a'} roughness={0.8} />
       </mesh>
-      {isEnraged && (
-        <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={2} distance={4} />
-      )}
-      {isFinalPhase && (
-        <pointLight position={[0, 0, 0]} color={'#ff00ff'} intensity={1.5} distance={6} />
-      )}
-      {boss.phase === 'attack' && (
-        <pointLight position={[0, 0.5, 0.3]} color={glow} intensity={3} distance={5} />
-      )}
     </group>
   )
 }

@@ -5,6 +5,17 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Particle } from '@/types/game'
 
+const colorCache = new Map<string, THREE.Color>()
+
+function getCachedColor(hex: string): THREE.Color {
+  let c = colorCache.get(hex)
+  if (!c) {
+    c = new THREE.Color(hex)
+    colorCache.set(hex, c)
+  }
+  return c
+}
+
 function ParticleSystem({ particles }: { particles: React.RefObject<Particle[]> }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const dummy = useRef(new THREE.Object3D())
@@ -13,6 +24,7 @@ function ParticleSystem({ particles }: { particles: React.RefObject<Particle[]> 
   useFrame(() => {
     if (!meshRef.current) return
     const pList = particles.current
+    const colorArr = colors.current
     for (let i = 0; i < 100; i++) {
       if (i < pList.length) {
         const p = pList[i]
@@ -22,10 +34,11 @@ function ParticleSystem({ particles }: { particles: React.RefObject<Particle[]> 
         dummy.current.updateMatrix()
         meshRef.current.setMatrixAt(i, dummy.current.matrix)
 
-        const c = new THREE.Color(p.color)
-        colors.current[i * 3] = c.r
-        colors.current[i * 3 + 1] = c.g
-        colors.current[i * 3 + 2] = c.b
+        const c = getCachedColor(p.color)
+        const idx = i * 3
+        colorArr[idx] = c.r
+        colorArr[idx + 1] = c.g
+        colorArr[idx + 2] = c.b
       } else {
         dummy.current.position.set(0, -100, 0)
         dummy.current.scale.setScalar(0)

@@ -19,7 +19,7 @@ import { ProjectileSystem } from '@/game/components/Projectiles'
 import { ParticleSystem } from '@/game/components/Particles'
 import { BossNinja, BossGolem, BossStorm, BossShadow } from '@/game/components/Bosses'
 import { CameraController } from '@/game/components/Camera'
-import { HUD, TouchControls, StartScreen, CoinSoundTrigger } from '@/game/ui/GameUI'
+import { HUD, TouchControls, StartScreen } from '@/game/ui/GameUI'
 
 // ============================================
 // MAIN GAME COMPONENT
@@ -237,6 +237,9 @@ export default function Game() {
           case 'combo':
             audioRef.current.playCombo()
             break
+          case 'coin':
+            audioRef.current.playCoin()
+            break
         }
       }
     })
@@ -329,8 +332,6 @@ export default function Game() {
           </div>
         </div>
       )}
-
-      <CoinSoundTrigger game={game} audio={audioRef} />
 
       {bossFlash && (
         <div

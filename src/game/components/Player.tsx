@@ -173,7 +173,7 @@ function Player({ player }: { player: React.RefObject<PlayerState> }) {
             <sphereGeometry args={[0.015, 6, 4]} />
             <meshStandardMaterial color="#0a1520" />
           </mesh>
-          <pointLight position={[0, 0.02, 0.28]} color={eyeGlow} intensity={1.0} distance={2.0} />
+
           <group ref={hoodTail1} position={[0.08, -0.06, -0.14]}>
             <mesh position={[0, 0, -0.08]}>
               <cylinderGeometry args={[0.025, 0.015, 0.2, 6]} />
@@ -634,7 +634,7 @@ function Player({ player }: { player: React.RefObject<PlayerState> }) {
               </mesh>
             )
           })}
-          <pointLight color="#ff5500" intensity={2} distance={2} />
+
         </group>
       )}
     </group>

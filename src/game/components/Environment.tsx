@@ -50,8 +50,8 @@ export function Environment() {
         intensity={2.0}
         color="#fff8e8"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-far={140}
         shadow-camera-left={-50}
         shadow-camera-right={90}
